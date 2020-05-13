@@ -11,25 +11,55 @@ public class Fruit : MonoBehaviour
 
     public int coloumn;
     public int row;
-    private Board board;
-    private GameObject nearfruit;
+    public int targetX, targetY;
 
+
+    private Board board;
+    private GameObject swipefruit;
+    private Vector2 tempPos;
+    
     void Start()
     {
         board = FindObjectOfType<Board>();
-        coloumn = (int)transform.position.x;
-        row = (int)transform.position.y;
+        targetX = (int)transform.position.x;
+        targetY = (int)transform.position.y;
+        row = targetY;
+        coloumn = targetX;
     }
 
     // Update is called once per frame
     void Update()
     {
+        targetX = coloumn;
+        targetY = row;
+
+        if (Mathf.Abs(targetX - transform.position.x) > .1)
+        {//swipe fruits with lerping
+            tempPos = new Vector2(targetX, transform.position.y);
+            transform.position = Vector2.Lerp(transform.position, tempPos, .4f);
+        }
+        else
+        {//set positon directly
+            tempPos = new Vector2(targetX, transform.position.y);
+            transform.position = tempPos;
+            board.allFruits[coloumn, row] = this.gameObject;
+        }
+        if (Mathf.Abs(targetY - transform.position.y) > .1)
+        {//swipe fruits with lerping
+            tempPos = new Vector2(transform.position.x, targetY);
+            transform.position = Vector2.Lerp(transform.position, tempPos, .4f);
+        }
+        else
+        {//set positon directly
+            tempPos = new Vector2(transform.position.x, targetY);
+            transform.position = tempPos;
+            board.allFruits[coloumn, row] = this.gameObject;
+        }
+
     }
 
     private void OnMouseDown()
     {
-        coloumn = (int)transform.position.x;
-        row = (int)transform.position.y;
         firstTouchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 
@@ -44,38 +74,39 @@ public class Fruit : MonoBehaviour
         angle = Mathf.Atan2(lastTouchPos.y - firstTouchPos.y, lastTouchPos.x - firstTouchPos.x)*180/Mathf.PI;
         MovePieces();
     }
-    private void MakeMove(int x, int y)
-    {
-        nearfruit = board.allFruits[coloumn + x, row + y];
-        transform.position = new Vector2(coloumn + x, row + y);
-        nearfruit.transform.position = new Vector2(coloumn, row);
-
-        GameObject tempfruit;
-        tempfruit = board.allFruits[coloumn, row];
-        board.allFruits[coloumn, row] = board.allFruits[coloumn + x, row + y];
-        board.allFruits[coloumn + x, row + y] = tempfruit;
-    }
-
+    
     void MovePieces()
     {
-        if (angle > -45 &&  45 >= angle)//Right Swipe
-            MakeMove(1, 0);
-
-        else if (angle <= -45 && angle > -135 )//Down Swipe
-            MakeMove(0, -1);
-
-        else if (angle <= -135 || angle > 135)//Left Swipe
-            MakeMove(-1, 0);
+        if (angle > -45 && 45 >= angle && coloumn < board.width)//Right Swipe
+        {
+            swipefruit = board.allFruits[coloumn + 1, row];
+            swipefruit.GetComponent<Fruit>().coloumn -= 1;
+            coloumn += 1;
+        }
+        else if (angle <= -45 && angle > -135 && row > 0)//Down Swipe
+        {
+            swipefruit = board.allFruits[coloumn, row-1];
+            swipefruit.GetComponent<Fruit>().row += 1;
+            row -= 1;
+        }
+        else if (angle <= -135 || angle > 135 && coloumn > 0)//Left Swipe
+        {
+            swipefruit = board.allFruits[coloumn - 1, row];
+            swipefruit.GetComponent<Fruit>().coloumn += 1;
+            coloumn -= 1;
+        }
         
-        else if(angle <= 135 && angle > 45 )//Up Swipe
-            MakeMove(0, 1);
+        else if (angle <= 135 && angle > 45 && row < board.height)//Up Swipe
+        {
+            swipefruit = board.allFruits[coloumn, row + 1];
+            swipefruit.GetComponent<Fruit>().row -= 1;
+            row += 1;
+        }
     }
 
-    //private void UpdateFruits()
-    //{
-    //    GameObject tempfruit;
-    //    tempfruit = board.allFruits[coloumn, row];
-    //    board.allFruits[coloumn, row] = board.allFruits[coloumn + 1, row];
-    //    board.allFruits[coloumn + 1, row] = tempfruit;
-    //}
+    private void CheckMatches()
+    {
+
+    }
+
 }
