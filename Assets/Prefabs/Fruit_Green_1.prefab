@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8260940831884733902}
   m_Layer: 0
   m_Name: Fruit_Green_1
-  m_TagString: Untagged
+  m_TagString: green
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -68,6 +68,8 @@ MonoBehaviour:
   angle: 0
   coloumn: 0
   row: 0
+  targetX: 0
+  targetY: 0
 --- !u!61 &8260940831884733902
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -333,7 +333,7 @@ GameObject:
   - component: {fileID: 6388125575249030554}
   m_Layer: 0
   m_Name: Fruit_Orange_1
-  m_TagString: Untagged
+  m_TagString: orange
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -384,6 +384,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebbbb993d8e7ec941a155cf12eeb7161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  angle: 0
+  coloumn: 0
+  row: 0
+  targetX: 0
+  targetY: 0
 --- !u!61 &6388125575249030554
 BoxCollider2D:
   m_ObjectHideFlags: 0
