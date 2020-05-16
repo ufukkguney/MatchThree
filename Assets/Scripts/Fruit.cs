@@ -154,7 +154,7 @@ public class Fruit : MonoBehaviour
 
     public void CheckMatches()
     {
-        if (coloumn > 0 && coloumn < board.width -1 && row > 0 && row < 7)
+        if (coloumn > 0 && coloumn < board.width -1 && row >= 0 && row <= 7)
         {
             GameObject leftfruit = board.allFruits[coloumn - 1, row];
             GameObject rightfruit = board.allFruits[coloumn + 1, row];

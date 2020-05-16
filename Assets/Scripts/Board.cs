@@ -46,7 +46,12 @@ public class Board : MonoBehaviour
                 GameObject fruit = Instantiate(fruits[randomInt], transform.position, Quaternion.identity);
                 fruit.transform.position = new Vector3(i, j, -1);
                 if (j >= 8)
+                {
                     fruit.transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+
+                    if(fruit.transform.GetComponent<BoxCollider2D>() != null)
+                        fruit.transform.GetComponent<BoxCollider2D>().enabled = false;
+                }
                 fruit.transform.parent = this.transform;
                 allFruits[i, j] = fruit;
             } 
@@ -129,7 +134,10 @@ public class Board : MonoBehaviour
                 {
                     allFruits[i, j].GetComponent<Fruit>().row -= nullCounter;
                     if (j < 8 + nullCounter)
+                    {
+                        allFruits[i, j].transform.GetComponent<BoxCollider2D>().enabled = true;
                         allFruits[i, j].transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                    }
 
                     allFruits[i, j].GetComponent<Fruit>().prevColoumn = allFruits[i, j].GetComponent<Fruit>().coloumn;
                     allFruits[i, j].GetComponent<Fruit>().prevRow = allFruits[i, j].GetComponent<Fruit>().row;
