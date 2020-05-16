@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    public int width;
+    public int width = 8;
     public int height;
 
     public GameObject tilePrefab;
@@ -25,11 +25,13 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
-                Vector2 tempos = new Vector2(i, j);
-                GameObject backgroundTemp = Instantiate(tilePrefab, tempos, Quaternion.identity);
-                backgroundTemp.name = "(" + i + ", " + j + ")";
-                backgroundTemp.transform.parent = transform;
-
+                if (j < 8)
+                {
+                    Vector2 tempos = new Vector2(i, j);
+                    GameObject backgroundTemp = Instantiate(tilePrefab, tempos, Quaternion.identity);
+                    backgroundTemp.name = "(" + i + ", " + j + ")";
+                    backgroundTemp.transform.parent = transform;
+                }
 
                 int randomInt = Random.Range(0, fruits.Length);
 
@@ -38,14 +40,14 @@ public class Board : MonoBehaviour
                 {
                     randomInt = Random.Range(0, fruits.Length);
                     maxIteration++;
-                    Debug.Log(maxIteration);
-
                 }
                 maxIteration = 0;
 
                 GameObject fruit = Instantiate(fruits[randomInt], transform.position, Quaternion.identity);
                 fruit.transform.position = new Vector3(i, j, -1);
-                fruit.transform.parent = backgroundTemp.transform;
+                if (j >= 8)
+                    fruit.transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+                fruit.transform.parent = this.transform;
                 allFruits[i, j] = fruit;
             } 
         }
@@ -88,16 +90,19 @@ public class Board : MonoBehaviour
     {
         if (allFruits[coloum,row].GetComponent<Fruit>().isMatched)
         {
+            allFruits[coloum, row].transform.localScale += new Vector3(0.5f, 0.5f, 0.5f);
             Destroy(allFruits[coloum, row]);
             allFruits[coloum, row] = null;
         }
     }
-
+    
     public void DestroyMatches()
     {
-        for (int i = 0; i < width; i++)
+        StopCoroutine(DownRowCo());
+
+        for (int i = 0; i < width; i++)//only destroy on 8x8 board
         {
-            for (int j = 0; j < height; j++)
+            for (int j = 0; j < 8; j++)
             {
                 if (allFruits[i,j] != null)
                 {
@@ -105,8 +110,9 @@ public class Board : MonoBehaviour
                 }
             }
         }
-        StartCoroutine(DownRowCo());//if Destroy happened bring the upside fruits
+            StartCoroutine(DownRowCo());//if Destroy happened bring the upside fruits
     }
+
 
     private IEnumerator DownRowCo()
     {
@@ -122,64 +128,18 @@ public class Board : MonoBehaviour
                 else if(nullCounter > 0)
                 {
                     allFruits[i, j].GetComponent<Fruit>().row -= nullCounter;
-                    allFruits[i, j] = null;//cotrol it!
+                    if (j < 8 + nullCounter)
+                        allFruits[i, j].transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
 
+                    allFruits[i, j].GetComponent<Fruit>().prevColoumn = allFruits[i, j].GetComponent<Fruit>().coloumn;
+                    allFruits[i, j].GetComponent<Fruit>().prevRow = allFruits[i, j].GetComponent<Fruit>().row;
+                    allFruits[i, j] = null;
                 }
-
             }
             nullCounter = 0;
         }
-        yield return new WaitForSeconds(.4f);
-
-        StartCoroutine(FillBoardCo());
-
+        yield return new WaitForSeconds(0.5f);
+        // there is should be a destroy check
+        DestroyMatches();
     }
-
-    private void RefillTheBlanks()
-    {
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                if (allFruits[i,j] == null)
-                {
-                    int tempInt = Random.Range(0, fruits.Length);
-                    allFruits[i, j] = Instantiate(fruits[tempInt], new Vector2(i, j), Quaternion.identity);
-                }
-            }
-        }
-    }
-
-    private bool GetMatchesOnBoard()
-    {
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                if (allFruits[i,j] != null)
-                {
-                    if (allFruits[i,j].GetComponent<Fruit>().isMatched)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private IEnumerator FillBoardCo()
-    {
-        RefillTheBlanks();
-        yield return new WaitForSeconds(.5f);
-
-        while (GetMatchesOnBoard())
-        {
-            yield return new WaitForSeconds(.5f);
-            DestroyMatches();
-        }
-
-    }
-
-
 }

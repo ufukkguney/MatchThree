@@ -42,11 +42,6 @@ public class Fruit : MonoBehaviour
     {
         CheckMatches();
 
-        if (isMatched)
-        {
-            //this.transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(0, 0, 0, .2f);
-        }
-
         targetX = coloumn;
         targetY = row;
 
@@ -131,13 +126,16 @@ public class Fruit : MonoBehaviour
             swipefruit.GetComponent<Fruit>().row -= 1;
             row += 1;
         }
+        
+
         StartCoroutine(ControlMoveCo());
 
     }
+    
 
     public IEnumerator ControlMoveCo()
     {
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(0.5f);
         if (swipefruit != null)
         {
             if (!isMatched && !swipefruit.GetComponent<Fruit>().isMatched)
@@ -152,12 +150,11 @@ public class Fruit : MonoBehaviour
                 board.DestroyMatches();
             }
         }
-
     }
 
-    private void CheckMatches()
+    public void CheckMatches()
     {
-        if (coloumn > 0 && coloumn < board.width -1)
+        if (coloumn > 0 && coloumn < board.width -1 && row > 0 && row < 7)
         {
             GameObject leftfruit = board.allFruits[coloumn - 1, row];
             GameObject rightfruit = board.allFruits[coloumn + 1, row];
@@ -170,9 +167,8 @@ public class Fruit : MonoBehaviour
                     isMatched = true;
                 }
             }
-            
         }
-        if (row > 0 && row < board.height - 1)
+        if (row > 0 && row < 7)
         {
             GameObject upfruit = board.allFruits[coloumn, row + 1];
             GameObject downfruit = board.allFruits[coloumn, row - 1];
@@ -185,7 +181,6 @@ public class Fruit : MonoBehaviour
                     isMatched = true;
                 }
             }
-            
         }
     }
 

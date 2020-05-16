@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &460016
 Transform:
   m_ObjectHideFlags: 0
@@ -95,7 +95,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &460018
 Transform:
   m_ObjectHideFlags: 0
@@ -228,6 +228,9 @@ MonoBehaviour:
   row: 0
   targetX: 0
   targetY: 0
+  prevColoumn: 0
+  prevRow: 0
+  isMatched: 0
 --- !u!61 &9170557771145867707
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -270,7 +273,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &460022
 Transform:
   m_ObjectHideFlags: 0

@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   width: 8
-  height: 8
+  height: 50
   tilePrefab: {fileID: 922795034502930551, guid: ceea5c6d57c681c4f933694293b481d6,
     type: 3}
   fruits:
