@@ -2,8 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum GameState
+{
+    move,
+    stop
+}
+
 public class Board : MonoBehaviour
 {
+    public GameState currentstate = GameState.move;
     public int width = 8;
     public int height;
 
@@ -11,6 +18,8 @@ public class Board : MonoBehaviour
     private TileBackground[,] allTiles;
     public GameObject[] fruits;
     public GameObject[,] allFruits;
+
+    private bool ismatch = false;
 
     void Start()
     {
@@ -25,9 +34,9 @@ public class Board : MonoBehaviour
         {
             for (int j = 0; j < height; j++)
             {
+                Vector2 tempos = new Vector2(i, j);
                 if (j < 8)
                 {
-                    Vector2 tempos = new Vector2(i, j);
                     GameObject backgroundTemp = Instantiate(tilePrefab, tempos, Quaternion.identity);
                     backgroundTemp.name = "(" + i + ", " + j + ")";
                     backgroundTemp.transform.parent = transform;
@@ -43,8 +52,7 @@ public class Board : MonoBehaviour
                 }
                 maxIteration = 0;
 
-                GameObject fruit = Instantiate(fruits[randomInt], transform.position, Quaternion.identity);
-                fruit.transform.position = new Vector3(i, j, -1);
+                GameObject fruit = Instantiate(fruits[randomInt], tempos, Quaternion.identity);
                 if (j >= 8)
                 {
                     fruit.transform.GetChild(0).GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
@@ -91,15 +99,9 @@ public class Board : MonoBehaviour
         return false;
     }
 
-    //private void DestroyMatchesOnPos()
-    //{
-        
-    //}
     
     public void DestroyMatches()
     {
-        StopCoroutine(DownRowCo());
-
         for (int i = 0; i < width; i++)//only destroy on 8x8 board
         {
             for (int j = 0; j < 8; j++)
@@ -110,7 +112,11 @@ public class Board : MonoBehaviour
                 }
             }
         }
+        if (ismatch == true)
             StartCoroutine(DownRowCo());//if Destroy happened bring the upside fruits
+        else
+            currentstate = GameState.move;
+
     }
 
     private IEnumerator DestroyMatchesOnPos(int coloum, int row)
@@ -119,11 +125,13 @@ public class Board : MonoBehaviour
 
         if (allFruits[coloum, row].GetComponent<Fruit>().isMatched)
         {
-                allFruits[coloum, row].transform.localScale = Vector3.Lerp(allFruits[coloum, row].transform.localScale
-                , new Vector3(1.3f, 1.3f, 1.3f),
-                .4f);
+            //currentstate = GameState.stop;
+            ismatch = true;
+            allFruits[coloum, row].transform.localScale = Vector3.Lerp(allFruits[coloum, row].transform.localScale
+            , new Vector3(1.3f, 1.3f, 1.3f),
+            .4f);
 
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitForSeconds(0.1f);
 
             Destroy(allFruits[coloum, row]);
             allFruits[coloum, row] = null;
@@ -132,6 +140,9 @@ public class Board : MonoBehaviour
 
     private IEnumerator DownRowCo()
     {
+        ismatch = false;
+        yield return new WaitForSeconds(.7f);
+
         int nullCounter = 0;
         for (int i = 0; i < width; i++)
         {
@@ -158,6 +169,8 @@ public class Board : MonoBehaviour
             nullCounter = 0;
         }
         yield return new WaitForSeconds(0.5f);
+
         DestroyMatches();
+        
     }
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class Fruit : MonoBehaviour
 {
     private Vector2 firstTouchPos;
@@ -22,11 +24,13 @@ public class Fruit : MonoBehaviour
     private Board board;
     private GameObject swipefruit;
     private Vector2 tempPos;
+
+    private MatchFinder matchFinder;
     
     void Start()
     {
         board = FindObjectOfType<Board>();
-
+        matchFinder = FindObjectOfType<MatchFinder>();
         targetX = (int)transform.position.x;
         targetY = (int)transform.position.y;
 
@@ -40,8 +44,6 @@ public class Fruit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckMatches();
-
         targetX = coloumn;
         targetY = row;
 
@@ -53,12 +55,12 @@ public class Fruit : MonoBehaviour
             {
                 board.allFruits[coloumn, row] = this.gameObject;
             }
+            matchFinder.FindAllMatches();
         }
         else
         {//set positon directly
             tempPos = new Vector2(targetX, transform.position.y);
             transform.position = tempPos;
-            //board.allFruits[coloumn, row] = this.gameObject;
         }
         if (Mathf.Abs(targetY - transform.position.y) > .1)
         {//swipe fruits with lerping
@@ -68,12 +70,12 @@ public class Fruit : MonoBehaviour
             {
                 board.allFruits[coloumn, row] = this.gameObject;
             }
+            matchFinder.FindAllMatches();
         }
         else
         {//set positon directly
             tempPos = new Vector2(transform.position.x, targetY);
             transform.position = tempPos;
-            //board.allFruits[coloumn, row] = this.gameObject;
         }
         
        
@@ -81,19 +83,26 @@ public class Fruit : MonoBehaviour
 
     private void OnMouseDown()
     {
-        firstTouchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (board.currentstate == GameState.move)
+        {
+            firstTouchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        }
     }
 
     private void OnMouseUp()
     {
-        lastTouchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        FingerMovesAngle();
+        if (board.currentstate == GameState.move)
+        {
+            lastTouchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            FingerMovesAngle();
+        }
     }
 
     void FingerMovesAngle()
     {
-        if (Mathf.Abs(lastTouchPos.y - firstTouchPos.y ) > 1 ||Mathf.Abs(lastTouchPos.x  - firstTouchPos.x) >1 )//check if its just a click
+        if (Mathf.Abs(lastTouchPos.y - firstTouchPos.y) > 1 || Mathf.Abs(lastTouchPos.x - firstTouchPos.x) > 1)//check if its just a click
         {
+            board.currentstate = GameState.stop;
             angle = Mathf.Atan2(lastTouchPos.y - firstTouchPos.y, lastTouchPos.x - firstTouchPos.x) * 180 / Mathf.PI;
             MovePieces();
         }
@@ -129,9 +138,7 @@ public class Fruit : MonoBehaviour
         
 
         StartCoroutine(ControlMoveCo());
-
     }
-    
 
     public IEnumerator ControlMoveCo()
     {
@@ -144,44 +151,14 @@ public class Fruit : MonoBehaviour
                 swipefruit.GetComponent<Fruit>().row = row;
                 row = prevRow;
                 coloumn = prevColoumn;
+                board.currentstate = GameState.move;
             }
             else
             {
                 board.DestroyMatches();
             }
+
+            
         }
     }
-
-    public void CheckMatches()
-    {
-        if (coloumn > 0 && coloumn < board.width -1 && row >= 0 && row <= 7)
-        {
-            GameObject leftfruit = board.allFruits[coloumn - 1, row];
-            GameObject rightfruit = board.allFruits[coloumn + 1, row];
-            if (leftfruit != null && rightfruit != null)
-            {
-                if (leftfruit.gameObject.tag == this.transform.gameObject.tag && rightfruit.gameObject.tag == this.transform.gameObject.tag)
-                {
-                    leftfruit.GetComponent<Fruit>().isMatched = true;
-                    rightfruit.GetComponent<Fruit>().isMatched = true;
-                    isMatched = true;
-                }
-            }
-        }
-        if (row > 0 && row < 7)
-        {
-            GameObject upfruit = board.allFruits[coloumn, row + 1];
-            GameObject downfruit = board.allFruits[coloumn, row - 1];
-            if (upfruit != null && downfruit != null)
-            {
-                if (upfruit.gameObject.tag == this.transform.gameObject.tag && downfruit.gameObject.tag == this.transform.gameObject.tag)
-                {
-                    upfruit.GetComponent<Fruit>().isMatched = true;
-                    downfruit.GetComponent<Fruit>().isMatched = true;
-                    isMatched = true;
-                }
-            }
-        }
-    }
-
 }
