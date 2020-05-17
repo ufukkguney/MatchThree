@@ -102,7 +102,6 @@ public class Fruit : MonoBehaviour
     {
         if (Mathf.Abs(lastTouchPos.y - firstTouchPos.y) > 1 || Mathf.Abs(lastTouchPos.x - firstTouchPos.x) > 1)//check if its just a click
         {
-            board.currentstate = GameState.stop;
             angle = Mathf.Atan2(lastTouchPos.y - firstTouchPos.y, lastTouchPos.x - firstTouchPos.x) * 180 / Mathf.PI;
             MovePieces();
         }
@@ -142,9 +141,10 @@ public class Fruit : MonoBehaviour
 
     public IEnumerator ControlMoveCo()
     {
-        yield return new WaitForSeconds(0.5f);
         if (swipefruit != null)
         {
+            board.currentstate = GameState.stop;
+            yield return new WaitForSeconds(0.5f);
             if (!isMatched && !swipefruit.GetComponent<Fruit>().isMatched)
             {
                 swipefruit.GetComponent<Fruit>().coloumn = coloumn;
