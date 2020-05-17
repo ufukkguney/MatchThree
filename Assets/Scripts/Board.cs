@@ -91,15 +91,10 @@ public class Board : MonoBehaviour
         return false;
     }
 
-    private void DestroyMatchesOnPos(int coloum, int row)
-    {
-        if (allFruits[coloum,row].GetComponent<Fruit>().isMatched)
-        {
-            allFruits[coloum, row].transform.localScale += new Vector3(0.5f, 0.5f, 0.5f);
-            Destroy(allFruits[coloum, row]);
-            allFruits[coloum, row] = null;
-        }
-    }
+    //private void DestroyMatchesOnPos()
+    //{
+        
+    //}
     
     public void DestroyMatches()
     {
@@ -111,13 +106,29 @@ public class Board : MonoBehaviour
             {
                 if (allFruits[i,j] != null)
                 {
-                    DestroyMatchesOnPos(i, j);
+                    StartCoroutine(DestroyMatchesOnPos(i, j));
                 }
             }
         }
             StartCoroutine(DownRowCo());//if Destroy happened bring the upside fruits
     }
 
+    private IEnumerator DestroyMatchesOnPos(int coloum, int row)
+    {
+        allFruits[coloum, row].transform.localScale = new Vector3(1, 1, 1);
+
+        if (allFruits[coloum, row].GetComponent<Fruit>().isMatched)
+        {
+                allFruits[coloum, row].transform.localScale = Vector3.Lerp(allFruits[coloum, row].transform.localScale
+                , new Vector3(1.3f, 1.3f, 1.3f),
+                .4f);
+
+            yield return new WaitForSeconds(0.4f);
+
+            Destroy(allFruits[coloum, row]);
+            allFruits[coloum, row] = null;
+        }
+    }
 
     private IEnumerator DownRowCo()
     {
@@ -147,7 +158,6 @@ public class Board : MonoBehaviour
             nullCounter = 0;
         }
         yield return new WaitForSeconds(0.5f);
-        // there is should be a destroy check
         DestroyMatches();
     }
 }
